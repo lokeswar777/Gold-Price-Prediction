@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold Price Prediction</title>
+    <title>Gold Price Prediction (INR)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -19,18 +19,10 @@
             font-size: 20px;
             margin-bottom: 20px;
         }
-        .price-info {
-            margin: 10px 0;
-            font-weight: bold;
-            color: #444;
-        }
         canvas {
             width: 100%;
             max-width: 800px;
-            margin: 20px auto;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: auto;
         }
         footer {
             margin-top: 30px;
@@ -48,12 +40,10 @@
 </head>
 <body>
     <h1>Gold Price Prediction (INR)</h1>
-    
     <div id="prices">
-        <p id="today-price" class="price-info">Loading today's price...</p>
-        <p id="predicted-price" class="price-info">Loading tomorrow's prediction...</p>
+        <p id="today-price">Loading today's price...</p>
+        <p id="predicted-price">Loading tomorrow's prediction...</p>
     </div>
-    
     <canvas id="goldChart"></canvas>
 
     <!-- Footer with your name and portfolio link -->
@@ -67,14 +57,18 @@
 
         // Fetch and display today's price and tomorrow's prediction
         fetch(`${apiBaseUrl}/predict`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.today_price !== undefined && data.tomorrow_predicted_price !== undefined) {
+                if (data.today_price && data.tomorrow_predicted_price) {
                     document.getElementById('today-price').innerText = `Today's Gold Price: ₹${data.today_price.toFixed(2)}`;
                     document.getElementById('predicted-price').innerText = `Tomorrow's Predicted Price: ₹${data.tomorrow_predicted_price.toFixed(2)}`;
                 } else {
-                    document.getElementById('prices').innerText = 'Price data is not available.';
-                    console.error('Invalid data format:', data);
+                    throw new Error('Invalid data format from API.');
                 }
             })
             .catch(error => {
@@ -84,64 +78,49 @@
 
         // Fetch historical data for the graph
         fetch(`${apiBaseUrl}/historical`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                if (Array.isArray(data) && data.length > 0) {
-                    const dates = data.map(item => item.date);
-                    const prices = data.map(item => item.close_price);
+                const dates = data.map(item => item.date);
+                const prices = data.map(item => item.close_price);
 
-                    const ctx = document.getElementById('goldChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dates,
-                            datasets: [{
-                                label: 'Gold Price (INR)',
-                                data: prices,
-                                borderColor: 'gold',
-                                backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                pointRadius: 3
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
+                const ctx = document.getElementById('goldChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Gold Price (INR)',
+                            data: prices,
+                            borderColor: 'gold',
+                            backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
                                     display: true,
-                                    labels: {
-                                        color: '#333'
-                                    }
+                                    text: 'Date'
                                 }
                             },
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Date',
-                                        color: '#333',
-                                        font: {
-                                            weight: 'bold'
-                                        }
-                                    }
-                                },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: 'Price (INR)',
-                                        color: '#333',
-                                        font: {
-                                            weight: 'bold'
-                                        }
-                                    }
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Price (INR)'
                                 }
                             }
                         }
-                    });
-                } else {
-                    console.error('Invalid historical data:', data);
-                }
+                    }
+                });
             })
             .catch(error => {
                 console.error('Error fetching historical data:', error);
