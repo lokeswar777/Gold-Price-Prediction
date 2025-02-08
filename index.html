@@ -20,6 +20,18 @@
             max-width: 800px;
             margin: auto;
         }
+        footer {
+            margin-top: 30px;
+            font-size: 16px;
+            color: #555;
+        }
+        footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -29,6 +41,12 @@
         <p id="predicted-price">Loading tomorrow's prediction...</p>
     </div>
     <canvas id="goldChart"></canvas>
+
+    <!-- Footer with your name and portfolio link -->
+    <footer>
+        <p>Made with ❤️ by <strong>Lokeswar</strong></p>
+        <p><a href="https://lokeswar777.github.io/portfolio/" target="_blank">Visit My Portfolio</a></p>
+    </footer>
 
     <script>
         const apiBaseUrl = 'https://gold-price-prediction-9l7w.onrender.com';
