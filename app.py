@@ -17,6 +17,7 @@ predicted_price = model.predict([[float(latest_close_price)]])[0]
 def get_prediction():
     return jsonify({
         'predicted_price': predicted_price,
+        
         'currency': 'INR'
     })
 
