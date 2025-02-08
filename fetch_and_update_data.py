@@ -38,18 +38,31 @@ else:
     updated_df = df
     print("No new data available.")
 
-# Retrain the model
-updated_df['next_close_price'] = updated_df['close_price'].shift(-1)
-updated_df = updated_df[:-1]
+# Ensure close_price is numeric
+updated_df['close_price'] = pd.to_numeric(updated_df['close_price'], errors='coerce')
 
+# Create the target variable for next close price
+updated_df['next_close_price'] = updated_df['close_price'].shift(-1)
+
+# Drop any rows with NaN values in either feature or target
+updated_df.dropna(subset=['close_price', 'next_close_price'], inplace=True)
+
+# Check for any remaining non-numeric data
+if updated_df[['close_price', 'next_close_price']].isnull().any().any():
+    print("Warning: There are still NaN values present in the dataset.")
+
+# Prepare the data for training
 X = updated_df[['close_price']]
 y = updated_df['next_close_price']
 
+# Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
+# Train the model
 model = LinearRegression()
 model.fit(X_train, y_train)
 
+# Evaluate the model
 y_pred = model.predict(X_test)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 print(f"Model retrained. RMSE: {rmse}")
