@@ -4,28 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gold Price Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; padding: 50px; }
-        h1 { color: #333; }
-        #price { font-size: 2em; color: #007BFF; margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #prediction {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        canvas {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
     </style>
 </head>
 <body>
     <h1>Gold Price Prediction (INR)</h1>
-    <p id="price">Loading...</p>
+    <div id="prediction">Loading prediction...</div>
+    <canvas id="goldChart"></canvas>
 
     <script>
-        // Replace with your Render backend URL
-        const apiUrl = 'https://gold-price-prediction-9l7w.onrender.com/predict';
+        const apiBaseUrl = 'https://gold-price-prediction-9l7w.onrender.com';
 
-        fetch(apiUrl)
+        // Fetch and display predicted price
+        fetch(`${apiBaseUrl}/predict`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('price').innerHTML = `₹${data.predicted_price.toFixed(2)}`;
+                document.getElementById('prediction').innerText = `Predicted Gold Price: ₹${data.predicted_price.toFixed(2)}`;
             })
             .catch(error => {
-                document.getElementById('price').innerHTML = 'Error fetching data!';
+                document.getElementById('prediction').innerText = 'Error fetching prediction.';
                 console.error('Error:', error);
+            });
+
+        // Fetch historical data for the graph
+        fetch(`${apiBaseUrl}/historical`)
+            .then(response => response.json())
+            .then(data => {
+                const dates = data.map(item => item.date);
+                const prices = data.map(item => item.close_price);
+
+                const ctx = document.getElementById('goldChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Gold Price (INR)',
+                            data: prices,
+                            borderColor: 'gold',
+                            backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            pointRadius: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Price (INR)'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching historical data:', error);
             });
     </script>
 </body>
