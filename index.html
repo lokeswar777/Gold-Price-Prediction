@@ -11,8 +11,8 @@
             text-align: center;
             padding: 20px;
         }
-        #prediction {
-            font-size: 24px;
+        #prices {
+            font-size: 20px;
             margin-bottom: 20px;
         }
         canvas {
@@ -24,20 +24,24 @@
 </head>
 <body>
     <h1>Gold Price Prediction (INR)</h1>
-    <div id="prediction">Loading prediction...</div>
+    <div id="prices">
+        <p id="today-price">Loading today's price...</p>
+        <p id="predicted-price">Loading tomorrow's prediction...</p>
+    </div>
     <canvas id="goldChart"></canvas>
 
     <script>
         const apiBaseUrl = 'https://gold-price-prediction-9l7w.onrender.com';
 
-        // Fetch and display predicted price
+        // Fetch and display today's price and tomorrow's prediction
         fetch(`${apiBaseUrl}/predict`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById('prediction').innerText = `Predicted Gold Price: ₹${data.predicted_price.toFixed(2)}`;
+                document.getElementById('today-price').innerText = `Today's Gold Price: ₹${data.today_price.toFixed(2)}`;
+                document.getElementById('predicted-price').innerText = `Tomorrow's Predicted Price: ₹${data.tomorrow_predicted_price.toFixed(2)}`;
             })
             .catch(error => {
-                document.getElementById('prediction').innerText = 'Error fetching prediction.';
+                document.getElementById('prices').innerText = 'Error fetching prices.';
                 console.error('Error:', error);
             });
 
