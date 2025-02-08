@@ -1,0 +1,37 @@
+# .github/workflows/daily_update.yml
+
+name: Daily Gold Price Update
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs every day at midnight UTC
+  workflow_dispatch:      # Allows manual trigger from GitHub UI
+
+jobs:
+  update_and_train:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run data fetch and model retraining script
+      run: |
+        python scripts/fetch_and_update_data.py
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add data/cleaned_gold_price_dataset.csv models/gold_price_model.pkl
+        git commit -m "Update dataset and retrain model"
+        git push
