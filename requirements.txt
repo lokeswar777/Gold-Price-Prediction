@@ -1,6 +1,7 @@
+Flask
 pandas
+plotly
 numpy
 scikit-learn
 yfinance
 joblib
-FLask
