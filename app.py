@@ -19,4 +19,16 @@ predicted_price = model.predict([[float(latest_close_price)]])[0]
 @app.route('/predict', methods=['GET'])
 def get_prediction():
     return jsonify({
-       
+        'today_price': latest_close_price,
+        'tomorrow_predicted_price': predicted_price,
+        'currency': 'INR'
+    })
+
+@app.route('/historical', methods=['GET'])
+def get_historical_data():
+    historical_data = data[['date', 'close_price']].tail(100)  # Last 100 days
+    historical_data['date'] = pd.to_datetime(historical_data['date']).dt.strftime('%Y-%m-%d')
+    return historical_data.to_json(orient='records')
+
+if __name__ == '__main__':
+    app.run(debug=True)
