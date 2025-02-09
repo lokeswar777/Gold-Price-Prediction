@@ -1,8 +1,9 @@
 name: Gold Price Prediction Scheduler
 
 on:
+  workflow_dispatch:  # Allows manual trigger
   schedule:
-    - cron: '0 * * * *'  # Runs every hour (you can change this)
+    - cron: '0 * * * *'
 
 jobs:
   run:
