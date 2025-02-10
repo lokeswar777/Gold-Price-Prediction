@@ -3,7 +3,7 @@ name: Gold Price Prediction Scheduler
 on:
   workflow_dispatch:  # Allows manual trigger
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'  # Run every hour
 
 jobs:
   run:
@@ -22,6 +22,6 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run Prediction Script
+      - name: Run Fetch and Update Script
         run: |
-          python predict.py
+          python scripts/fetch_and_update_data.py  # Update this to your script's path
