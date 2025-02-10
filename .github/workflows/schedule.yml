@@ -24,4 +24,4 @@ jobs:
 
       - name: Run Fetch and Update Script
         run: |
-          python scripts/fetch_and_update_data.py  # Update this to your script's path
+          python fetch_and_update_data.py  # Update this to your script's path
